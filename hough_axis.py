@@ -67,3 +67,7 @@ def detect_axis_bounding_box(image_path):
 image_path = "test_figs/given/plot_0_1.png"
 bounding_box = detect_axis_bounding_box(image_path)
 bounding_box
+# save bounding box to a csv file
+np.savetxt(
+    "test_figs/given/plot_0_1_bounding_box.csv", bounding_box, delimiter=","
+)

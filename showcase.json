@@ -1,0 +1,43 @@
+{
+    "chart_id": 1,
+    "top_left": [
+        40,
+        0
+    ],
+    "bottom_right": [
+        850,
+        245
+    ],
+    "y_axis_label": "SO₂, O₃, NO₂ (µg/m³)",
+    "y_axis_max": 180,
+    "y_axis_min": 0,
+    "y_axis_ticks": [
+        0,
+        60,
+        120,
+        180
+    ],
+    "x_axis_label": null,
+    "x_axis_max": null,
+    "x_axis_min": null,
+    "x_axis_ticks": null,
+    "title": null,
+    "plots": [
+        {
+            "name": "SO₂",
+            "color": "red"
+        },
+        {
+            "name": "O₃",
+            "color": "cyan"
+        },
+        {
+            "name": "NO₂",
+            "color": "blue"
+        },
+        {
+            "name": "CO",
+            "color": "green"
+        }
+    ]
+}

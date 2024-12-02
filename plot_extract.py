@@ -3,9 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial.distance import cdist
 from scipy.interpolate import interp1d
+from langchain import tools
 
 
-def extract_and_link_plot_points_with_segment_interpolation(
+@tools
+def extract_and_save_plot_points(
     image_path,
     target_color,
     tolerance=10,
@@ -14,7 +16,7 @@ def extract_and_link_plot_points_with_segment_interpolation(
 ):
     """
     Extracts and links plot points in a chart image based on the specified color, removes legend samples,
-    and interpolates only when connecting separate plot segments.
+    interpolates between segments, and saves the points as a sorted NumPy array.
 
     Parameters:
         image_path (str): Path to the input image.
@@ -24,7 +26,7 @@ def extract_and_link_plot_points_with_segment_interpolation(
         legend_filter_length (int): Maximum segment length to be considered a legend sample (default is 50 pixels).
 
     Returns:
-        list: A list of (x, y) coordinates representing the linked plot curve.
+        np.ndarray: A 2D NumPy array where each row represents a point (x, y), sorted by x.
     """
     # Load the image
     image = cv2.imread(image_path)
@@ -45,7 +47,7 @@ def extract_and_link_plot_points_with_segment_interpolation(
 
     if not plot_points:
         print("No points detected for the specified color.")
-        return []
+        return np.array([])
 
     # Link nearby points
     linked_points = []
@@ -101,6 +103,12 @@ def extract_and_link_plot_points_with_segment_interpolation(
     if filtered_segments:
         final_points.extend([tuple(point) for point in filtered_segments[-1]])
 
+    # Convert to NumPy array and sort by x-coordinate
+    final_array = np.array(final_points)
+    final_array = final_array[
+        np.argsort(final_array[:, 0])
+    ]  # Sort by x-coordinate
+
     # Visualize the original image and extracted points in subplots
     fig, axes = plt.subplots(1, 2, figsize=(12, 6))
 
@@ -115,24 +123,36 @@ def extract_and_link_plot_points_with_segment_interpolation(
     axes[0].axis("off")
 
     # Plot only the extracted points
-    axes[1].scatter(*zip(*final_points), s=1, color="red")
-    axes[1].set_title("Interpolated Plot Points")
+    axes[1].scatter(final_array[:, 0], final_array[:, 1], s=1, color="red")
+    axes[1].set_title("Extracted and Sorted Plot Points")
     axes[1].invert_yaxis()  # Flip y-axis to match image orientation
     axes[1].set_aspect("equal", adjustable="datalim")
 
     plt.tight_layout()
     plt.show()
 
-    return final_points
+    return final_array
 
 
-# Example usage
-image_path = "test_figs/given/plot_0_1.png"
-target_color = (0, 255, 255)  # Example: cyan
-tolerance = 20  # Adjust tolerance as needed
-link_distance = 5  # Maximum distance to link fragments
-legend_filter_length = 50  # Maximum length to identify legend lines
-linked_points = extract_and_link_plot_points_with_segment_interpolation(
-    image_path, target_color, tolerance, link_distance, legend_filter_length
-)
-linked_points[:10]  # Display first 10 linked points
+def main():
+    # Example usage
+    image_path = "test_figs/given/plot_0_1.png"
+    target_color = (0, 255, 255)  # Example: cyan
+    tolerance = 20  # Adjust tolerance as needed
+    link_distance = 5  # Maximum distance to link fragments
+    legend_filter_length = 50  # Maximum length to identify legend lines
+    linked_points_array = extract_and_save_plot_points(
+        image_path, target_color, tolerance, link_distance, legend_filter_length
+    )
+    print(linked_points_array[:10])  # Display the first 10 rows
+    print(linked_points_array.shape)  # Display the array shape
+    # save the points to a file
+    np.savetxt(
+        "test_figs/given/plot_0_1_points.csv",
+        linked_points_array,
+        delimiter=",",
+    )
+
+
+if __name__ == "__main__":
+    main()
