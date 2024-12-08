@@ -1,14 +1,20 @@
+import argparse
+import os
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-def detect_axis_bounding_box(image_path):
+def detect_axis_bounding_box(
+    image_path, output_dir, output_suffix, debug=False
+):
     """
     Detects the bounding box of the axis frame in a chart image using Hough Line Transform.
 
     Parameters:
         image_path (str): Path to the input image.
+        output_dir (str): Directory to save the bounding box CSV file.
+        output_suffix (str): Suffix to append to the output file name.
 
     Returns:
         tuple: Coordinates of the bounding box ((min_x, min_y), (max_x, max_y)) or None if not detected.
@@ -51,6 +57,20 @@ def detect_axis_bounding_box(image_path):
     max_x = max(line[0] for line in vertical_lines)
     bounding_box = ((min_x, min_y), (max_x, max_y))
 
+    # Prepare output file name and path
+    base_name = os.path.splitext(os.path.basename(image_path))[0]
+    output_file_name = f"{base_name}{output_suffix}.csv"
+    output_path = os.path.join(output_dir, output_file_name)
+
+    # Ensure output directory exists
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Save bounding box to CSV
+    np.savetxt(output_path, bounding_box, delimiter=",", fmt="%d")
+    print(f"Bounding box coordinates saved to {output_path}")
+
+    if not debug:
+        return bounding_box
     # Visualize the result
     output_image = image.copy()
     cv2.rectangle(output_image, (min_x, min_y), (max_x, max_y), (255, 0, 0), 2)
@@ -63,11 +83,45 @@ def detect_axis_bounding_box(image_path):
     return bounding_box
 
 
-# Example usage
-image_path = "test_figs/given/plot_0_1.png"
-bounding_box = detect_axis_bounding_box(image_path)
-bounding_box
-# save bounding box to a csv file
-np.savetxt(
-    "test_figs/given/plot_0_1_bounding_box.csv", bounding_box, delimiter=","
-)
+def parse_args():
+    """
+    Parses command-line arguments for the script.
+
+    Returns:
+        Namespace: Parsed arguments.
+    """
+    parser = argparse.ArgumentParser(
+        description="Detect axis bounding box in a chart image."
+    )
+    parser.add_argument(
+        "--image_path", type=str, help="Path to the input image."
+    )
+    parser.add_argument(
+        "--output_dir",
+        type=str,
+        help="Directory to save the bounding box CSV file.",
+        default="output/borderline",
+    )
+    parser.add_argument(
+        "--output_suffix",
+        type=str,
+        help="Suffix to append to the output file name.",
+        default="_bounding_box",
+    )
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Display the detected bounding box on the image.",
+    )
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+    detect_axis_bounding_box(
+        args.image_path, args.output_dir, args.output_suffix, args.debug
+    )
+
+
+if __name__ == "__main__":
+    main()

@@ -39,7 +39,9 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description="Crop an image using bounding box coordinates."
     )
-    parser.add_argument("image_path", type=str, help="Path to the input image.")
+    parser.add_argument(
+        "--image_path", type=str, help="Path to the input image."
+    )
     parser.add_argument(
         "--top_left",
         type=str,
