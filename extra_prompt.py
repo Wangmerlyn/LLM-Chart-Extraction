@@ -53,8 +53,10 @@ Plot Information (for sub-charts containing multiple plots):
 A list of all plot names and their corresponding colors as specified in the legend. Each entry should include:
 Plot name: The name of the plot (as listed in the legend).
 Color: The color associated with the plot in the legend.
-Y Axis Information: The y-axis information for the sub-chart.
-X Axis Information: The x-axis information for the sub-chart.
+Y Axis Max: The maximum value on the y-axis for the plot.
+Y Axis Min: The minimum value on the y-axis for the plot.
+X Axis Max: The maximum value on the x-axis for the plot.
+X Axis Min: The minimum value on the x-axis for the plot.
 
 The input format for the bounding boxes is as follows:
 {}

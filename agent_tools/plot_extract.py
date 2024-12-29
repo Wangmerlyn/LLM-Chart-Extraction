@@ -85,7 +85,14 @@ def extract_and_save_plot_points(
     # Convert to NumPy array and sort by x-coordinate
     final_array = np.array(final_points)
     final_array = final_array[np.argsort(final_array[:, 0])]
-
+    plot_array = final_array.copy()
+    # group final array by x-coordinate, take the average of y-coordinate
+    final_array = np.array(
+        [
+            [x, np.mean(final_array[final_array[:, 0] == x][:, 1])]
+            for x in np.unique(final_array[:, 0])
+        ]
+    )
     # Prepare output file name and path
     base_name = os.path.splitext(os.path.basename(image_path))[0]
     output_file_name = f"{base_name}{output_suffix}.csv"
@@ -101,7 +108,8 @@ def extract_and_save_plot_points(
         return final_array
     # Visualization
     plt.figure(figsize=(12, 6))
-    plt.scatter(final_array[:, 0], final_array[:, 1], s=1, color="red")
+    # plt.scatter(final_array[:, 0], final_array[:, 1], s=1, color="red")
+    plt.scatter(plot_array[:, 0], plot_array[:, 1], s=1, color="red")
     plt.gca().invert_yaxis()
     plt.title("Extracted Plot Points")
     plt.xlabel("X")

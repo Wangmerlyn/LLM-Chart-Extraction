@@ -102,13 +102,13 @@ def extract_info(client, data_url, box_list, prompt_manager):
 from agent_tools.get_top_colors import get_top_n_colors
 
 
-def get_color(client, image_path, input_color, top_n=10) -> dict:
+def get_color(client, image_path, input_color, top_n=15) -> dict:
     get_top_n_colors(image_path, top_n)
     # Get the top N colors from the image
     top_colors = get_top_n_colors(image_path, top_n)
 
     # Print the top N most frequent colors and their counts
-    color_prompt = f"""Please identify the color that best matches the following description: {input_color}, return the RGB value in the format
+    color_prompt = f"""From the color list below, please identify the color that best matches the following description: {input_color}, return the RGB value in the format
     ```json{{
         "R": xxx,
         "G": xxx,
@@ -116,8 +116,8 @@ def get_color(client, image_path, input_color, top_n=10) -> dict:
     }}
     """
     for idx, (color, count) in enumerate(top_colors, 1):
-        print(f"Color {idx}: RGB = {color}, Count = {count}")
-        color_prompt += f"Color {idx}: RGB = {color}, Count = {count}\n"
+        print(f"Color {idx}: R, G, B = {color}, Count = {count}")
+        color_prompt += f"Color {idx}: R, G, B = {color}\n"
     color_message = client.chat.completions.create(
         model="gpt-4o",
         temperature=0,
@@ -126,6 +126,7 @@ def get_color(client, image_path, input_color, top_n=10) -> dict:
         ],
     )
     color_message = color_message.choices[0].message.content
+    print(color_message)
     color_message = color_message.split("```")[1]
     if color_message.startswith("json"):
         color_message = color_message[4:]

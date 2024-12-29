@@ -5,8 +5,8 @@ import sys
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from PIL import Image
+import pandas as pd
 import numpy as np
-
 from openai import OpenAI
 
 from utilities import local_image_to_data_url
@@ -18,7 +18,7 @@ from agent_tools.hough_axis import detect_axis_bounding_box
 from agent_tools.plot_extract import extract_and_save_plot_points
 from agent_process import *
 
-IMAGE_PATH = "test_figs/given/plot_1.png"
+IMAGE_PATH = "test_figs/given/plot_0.png"
 DEBUG = True
 CROP_OUTPUT_DIR = "output/cropped"
 CROP_OUTPUT_SUFFIX = "{}_cropped"
@@ -181,10 +181,16 @@ for crop_image_path, box_info in zip(crop_image_list, box_info_list):
         plot_name = plot["name"]
         color = get_color(client, crop_image_path, plot["color"])
         logger.info("Color for plot %s: %s", plot["name"], color)
-        extract_and_save_plot_points(
+        return_array = extract_and_save_plot_points(
             crop_image_path,
             target_color=(color["R"], color["G"], color["B"]),
             output_dir="output/plot_points",
             output_suffix=f"{plot_name}_plot_points",
             debug=DEBUG,
+        )
+        # convert the return array into a panda dataframe
+        # return array is a 2D array with x and y coordinates
+        # create a dataframe with columns x and y
+        pd.DataFrame(return_array, columns=["x", plot_name]).to_csv(
+            f"output/plot_points/{plot_name}_plot_points.csv", index=False
         )
