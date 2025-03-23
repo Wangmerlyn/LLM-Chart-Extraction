@@ -1,0 +1,73 @@
+[
+    {
+        "chart_id": 1,
+        "top_left": [
+            99,
+            11
+        ],
+        "bottom_right": [
+            642,
+            198
+        ],
+        "y_axis_label": [
+            "Mixing depth (m)",
+            "Wind speed (m/s)"
+        ],
+        "y_axis_max": [
+            3200,
+            6.0
+        ],
+        "y_axis_min": [
+            0,
+            0.0
+        ],
+        "y_axis_ticks": [
+            [
+                0,
+                800,
+                1600,
+                2400,
+                3200
+            ],
+            [
+                0.0,
+                1.5,
+                3.0,
+                4.5,
+                6.0
+            ]
+        ],
+        "x_axis_label": null,
+        "x_axis_max": null,
+        "x_axis_min": null,
+        "x_axis_ticks": [
+            "5/28",
+            "5/29",
+            "5/30",
+            "5/31",
+            "6/1",
+            "6/2",
+            "6/3",
+            "6/4",
+            "6/5",
+            "6/6"
+        ],
+        "title": "Nanjing",
+        "plots": [
+            {
+                "name": "Mixing depth",
+                "color": "black",
+                "y_axis_max": 3200,
+                "y_axis_min": 0,
+                "y_axis_label": "Mixing depth (m)"
+            },
+            {
+                "name": "Wind speed",
+                "color": "red",
+                "y_axis_max": 6.0,
+                "y_axis_min": 0.0,
+                "y_axis_label": "Wind speed (m/s)"
+            }
+        ]
+    }
+]

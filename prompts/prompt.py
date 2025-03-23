@@ -79,8 +79,8 @@ The output format should be a list of dictionaries, where each dictionary repres
     "x_axis_ticks": [0, 2, 4, 6, 8, 10],
     "title": "Sub-chart title",
     "plots": [
-      {{"name": "Plot 1", "color": "red", "y_axis_max": 3, "y_axis_min": 0}},
-      {{"name": "Plot 2", "color": "blue", "y_axis_max": 100, "y_axis_min": 0}}
+      {{"name": "Plot 1", "color": "red", "y_axis_max": 3, "y_axis_min": 0, y_axis_label: "axis_1_label"}},
+      {{"name": "Plot 2", "color": "blue", "y_axis_max": 100, "y_axis_min": 0, y_axis_label: "axis_2_label"}},
     ]
   }},
   {{

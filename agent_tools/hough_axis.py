@@ -62,8 +62,7 @@ def detect_axis_bounding_box(image_input:Union[np.ndarray,str,Image.Image], outp
     )
 
     if lines is None:
-        print("No lines detected.")
-        return None
+        raise ValueError("No lines detected. Check the image or parameters.")
 
     # === Separate horizontal and vertical lines ===
     horizontal_lines = []
@@ -76,8 +75,7 @@ def detect_axis_bounding_box(image_input:Union[np.ndarray,str,Image.Image], outp
             vertical_lines.append((x1, y1, x2, y2))
 
     if not horizontal_lines or not vertical_lines:
-        print("Insufficient lines detected for bounding box.")
-        return None
+        raise ValueError("No horizontal or vertical lines detected. Check the image or parameters.")
 
     # === Bounding box coordinates ===
     min_y = min(line[1] for line in horizontal_lines)

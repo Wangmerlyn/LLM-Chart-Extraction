@@ -1,16 +1,23 @@
 import os
 import argparse
+from typing import Union, Tuple, Optional
 from PIL import Image
+import numpy as np
+import cv2
 
 
 def crop_image(
-    image_path, top_left, bottom_right, output_dir, output_suffix
-) -> str:
+    image_input: Union[str, np.ndarray, Image.Image],
+    top_left: Tuple[int, int],
+    bottom_right: Tuple[int, int],
+    output_dir: Optional[str]=None,
+    output_suffix: Optional[str]=None,
+) -> Union[str, Image.Image]:
     """
     Crops an image based on the given bounding box.
 
     Parameters:
-    - image_path (str): Path to the input image.
+    - image_input (str | np.ndarray | PIL.Image.Image): Input image (path, cv2 array, or PIL image).
     - top_left (tuple): Coordinates of the top-left corner (x, y).
     - bottom_right (tuple): Coordinates of the bottom-right corner (x, y).
     - output_dir (str): Directory to save the cropped image.
@@ -19,23 +26,42 @@ def crop_image(
     Returns:
     - str: Path to the cropped image.
     """
-    # Open the image
-    image = Image.open(image_path)
+
+    # Handle input image
+    if isinstance(image_input, str):
+        image = Image.open(image_input)
+        base_name, ext = os.path.splitext(os.path.basename(image_input))
+    elif isinstance(image_input, np.ndarray):
+        # Convert OpenCV BGR image to PIL RGB
+        image = Image.fromarray(cv2.cvtColor(image_input, cv2.COLOR_BGR2RGB))
+        base_name = "image_array"
+        ext = ".png"
+    elif isinstance(image_input, Image.Image):
+        image = image_input
+        base_name = "pil_image"
+        ext = ".png"
+    else:
+        raise TypeError(
+            f"Unsupported image_input type: {type(image_input)}. Expected str, np.ndarray, or PIL.Image.Image."
+        )
 
     # Crop the image using the bounding box
     cropped_image = image.crop((*top_left, *bottom_right))
 
-    # Extract original file name and extension
-    base_name, ext = os.path.splitext(os.path.basename(image_path))
-
     # Generate output file name and path
-    output_file_name = f"{base_name}{output_suffix}{ext}"
-    output_path = os.path.join(output_dir, output_file_name)
+    if output_suffix is not None and output_dir is not None:
+        output_file_name = f"{base_name}{output_suffix}{ext}"
+        output_path = os.path.join(output_dir, output_file_name)
 
-    # Save the cropped image
-    cropped_image.save(output_path)
-    print(f"Cropped image saved to {output_path}")
-    return output_path
+        # Ensure output directory exists
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Save the cropped image
+        cropped_image.save(output_path)
+        print(f"Cropped image saved to {output_path}")
+        return output_path
+    else:
+        return cropped_image
 
 
 def parse_args():
