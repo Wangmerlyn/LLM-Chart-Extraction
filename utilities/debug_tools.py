@@ -25,3 +25,8 @@ def plot_image(image:Union[np.ndarray,str,Image.Image])->None:
     plt.imshow(img)
     plt.axis('off')  # Hide the axes
     plt.show()
+    # print resolution info about the images
+    print(f"Image size: {img.size[0]} x {img.size[1]}")
+    print(f"Image mode: {img.mode}")
+    print(f"Image format: {img.format}")
+    print(f"Image info: {img.info}")
