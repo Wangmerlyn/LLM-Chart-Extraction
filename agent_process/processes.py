@@ -2,7 +2,7 @@ import json
 import sys
 
 
-def get_rough_crop(client, data_url, prompt_manager) -> str:
+def get_rough_crop(client, data_url, prompt_manager, model_name="gpt-4o") -> str:
 
     chat_completion = client.chat.completions.create(
         temperature=0,
@@ -23,7 +23,7 @@ def get_rough_crop(client, data_url, prompt_manager) -> str:
                 ],
             }
         ],
-        model="gpt-4o",
+        model=model_name,
     )
 
     return chat_completion.choices[0].message.content
