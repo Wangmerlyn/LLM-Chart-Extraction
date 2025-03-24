@@ -4,33 +4,45 @@ import argparse
 from collections import Counter
 
 
-def get_top_n_colors(image_path, n=10):
+
+import cv2
+import numpy as np
+from PIL import Image
+from collections import Counter
+from typing import Union, List, Tuple
+
+def get_top_n_colors(image_input: Union[str, np.ndarray, Image.Image], n: int = 10) -> List[Tuple[Tuple[int, int, int], int]]:
     """
     Perform color frequency analysis on an image and return the top N most frequent colors.
 
     Parameters:
-        image_path (str): Path to the input image.
+        image_input (str | np.ndarray | PIL.Image.Image): Path to the image, or image object.
         n (int): Number of top colors to return (default is 10).
 
     Returns:
-        List of tuples: Each tuple contains a color (RGB) and its count in the image.
+        List[Tuple[Tuple[int, int, int], int]]: List of (RGB color, count) tuples.
     """
-    # Load the image
-    image = cv2.imread(image_path)
+    # Handle image input types
+    if isinstance(image_input, str):
+        image = cv2.imread(image_input)
+        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    elif isinstance(image_input, np.ndarray):
+        # Assume it's OpenCV format (BGR), convert to RGB
+        image_rgb = cv2.cvtColor(image_input, cv2.COLOR_BGR2RGB)
+    elif isinstance(image_input, Image.Image):
+        # Convert PIL to RGB then to numpy array
+        image_rgb = np.array(image_input.convert("RGB"))
+    else:
+        raise TypeError(f"image_input must be a file path, NumPy array, or PIL.Image.Image, got {type(image_input)} instead.")
 
-    # Convert the image to RGB (OpenCV loads images in BGR by default)
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
-    # Reshape the image into a 2D array where each row is an RGB value
+    # Flatten the image to a list of RGB tuples
     pixels = image_rgb.reshape(-1, 3)
 
-    # Use Counter to count the frequency of each color (as a tuple)
+    # Count color frequencies
     color_counts = Counter(map(tuple, pixels))
 
-    # Get the top N most common colors
-    top_colors = color_counts.most_common(n)
-
-    return top_colors
+    # Return top N
+    return color_counts.most_common(n)
 
 
 def parse_args():

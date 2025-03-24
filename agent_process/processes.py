@@ -1,8 +1,10 @@
 import json
 import sys
 
+from utilities.output_convert import model_output_to_json
 
-def get_rough_crop(client, data_url, prompt_manager) -> str:
+
+def get_rough_crop(client, data_url, prompt_manager, model_name="gpt-4o") -> str:
 
     chat_completion = client.chat.completions.create(
         temperature=0,
@@ -23,7 +25,7 @@ def get_rough_crop(client, data_url, prompt_manager) -> str:
                 ],
             }
         ],
-        model="gpt-4o",
+        model=model_name,
     )
 
     return chat_completion.choices[0].message.content
@@ -58,7 +60,7 @@ def box_refine(client, data_url, prompt_manager, box_list) -> str:
     return message
 
 
-def extract_info(client, data_url, box_list, prompt_manager):
+def extract_info(client, data_url, box_list, prompt_manager, model_name="gpt-4o") -> str:
     """
     Extracts information from the sub-charts within an image.
 
@@ -92,18 +94,16 @@ def extract_info(client, data_url, box_list, prompt_manager):
                 ],
             }
         ],
-        model="gpt-4o",
+        model=model_name,
     )
     message = chat_completion.choices[0].message.content
-    message
     return message
 
 
 from agent_tools.get_top_colors import get_top_n_colors
 
 
-def get_color(client, image_path, input_color, top_n=15) -> dict:
-    get_top_n_colors(image_path, top_n)
+def get_color(client, image_path, input_color, top_n=15, model_name="gpt-4o") -> dict:
     # Get the top N colors from the image
     top_colors = get_top_n_colors(image_path, top_n)
 
@@ -119,22 +119,13 @@ def get_color(client, image_path, input_color, top_n=15) -> dict:
         print(f"Color {idx}: R, G, B = {color}, Count = {count}")
         color_prompt += f"Color {idx}: R, G, B = {color}\n"
     color_message = client.chat.completions.create(
-        model="gpt-4o",
+        model=model_name,
         temperature=0,
         messages=[
             {"role": "user", "content": color_prompt},
         ],
     )
     color_message = color_message.choices[0].message.content
-    print(color_message)
-    color_message = color_message.split("```")[1]
-    if color_message.startswith("json"):
-        color_message = color_message[4:]
-    color_message = color_message.strip()
-
-    try:
-        color_json = json.loads(color_message)
-        return color_json
-    except json.JSONDecodeError:
-        print("Error decoding JSON: %s", color_message)
-        sys.exit(1)
+    color_json = model_output_to_json(color_message)
+    return color_json
+    
